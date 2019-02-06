@@ -9,3 +9,8 @@
 + 166587793039096 evq.select
 - 166587794687847 evq.select
 ```
+
+```
+sudo perf record -a -e 'syscalls:*' --exclude-perf -e 'timer:*' --exclude-perf
+sudo perf script --fields 'comm,tid,pid,time,event,trace' | ./perf2trace
+```

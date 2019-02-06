@@ -1,0 +1,29 @@
+#!/usr/bin/lua
+
+local procname = {}
+local out = {}
+
+for l in io.lines() do
+	for name, pid, tid, t, el, call, args in l:gmatch("%s*(%S+) +(%d+)/(%d+) +([%d%.]+): +syscalls:sys_([^_]+)_([^:]+): +(.+)") do
+		name = name:gsub("%.", "-")
+		if pid == tid then
+			procname[pid] = name
+		end
+		t = math.floor(t * 1e6)
+		el = (el == "enter") and "+" or "-"
+		name = name:gsub("%.", ":")
+		out[#out+1] = {
+			el = el,
+			t = t,
+			pid = pid,
+			line = tid .. "/" .. name .. " " .. call .. " " .. args
+		}
+	end
+end
+
+for _, l in ipairs(out) do
+	local name = procname[l.pid] or l.pid
+	print(l.el .. " " .. l.t .. " " .. name .. "." .. l.line)
+end
+
+-- vi: ft=lua ts=3 sw=3
